@@ -21,7 +21,7 @@ import me.tatocaster.radiostreamtest.network.VolleyClient;
 public class MainActivity extends Activity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
-    String streamingURL = null;
+    String streamingURL = "";
     Button pauseBtn, resumeBtn;
     MediaPlayer mediaPlayer;
 
@@ -35,7 +35,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         resumeBtn = (Button) findViewById(R.id.resume_btn);
         resumeBtn.setOnClickListener(this);
 
-//        String url = "http://www.hrupin.com/wp-content/uploads/mp3/testsong_20_sec.mp3";
         String url = "http://yp.shoutcast.com/sbin/tunein-station.pls?id=175821";
 
         VolleyClient.getInstance(this).checkoutPLS(new Response.Listener<String>() {
@@ -56,6 +55,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 }
                 Log.d(TAG, streamingURL);
+                if(streamingURL.equals("")){
+                    pauseBtn.setVisibility(View.INVISIBLE);
+                    resumeBtn.setVisibility(View.INVISIBLE);
+                    return;
+                }
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 try {
