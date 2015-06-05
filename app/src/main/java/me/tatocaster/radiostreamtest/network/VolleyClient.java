@@ -18,7 +18,6 @@ public class VolleyClient {
     private static VolleyClient mInstance;
     private Context context;
     private RequestQueue mRequestQueue;
-    private final static String appendingUrl = "";
 
     public static VolleyClient getInstance(Context context) {
         if (mInstance == null) {
@@ -42,8 +41,9 @@ public class VolleyClient {
     }
 
 
-    public void checkoutPLS(final Response.Listener<String> response, final Response.ErrorListener error, String url) {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response, error);
+    public void checkoutPLS(final Response.Listener<String> response, final Response.ErrorListener error, int stationID) {
+        final String stationURL = Constants.STATION_BASE_URL + stationID;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, stationURL, response, error);
         execute(stringRequest);
     }
 

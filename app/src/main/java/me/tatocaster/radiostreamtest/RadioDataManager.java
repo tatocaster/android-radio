@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.tatocaster.radiostreamtest.interfaces.IStationPLSReceiver;
 import me.tatocaster.radiostreamtest.interfaces.ITopStationReceiver;
 import me.tatocaster.radiostreamtest.model.Station;
 import me.tatocaster.radiostreamtest.network.VolleyClient;
@@ -22,13 +23,19 @@ import me.tatocaster.radiostreamtest.network.VolleyClient;
 public class RadioDataManager {
 
     Context mContext;
+    private String streamingURL = "";
     List<Station> stationsList = new ArrayList<>();
 
     public RadioDataManager(Context context) {
         this.mContext = context;
     }
 
-
+    /**
+     * get top stations. default is 500
+     *
+     * @param listener interface
+     * @param genre    , if genre exists fetch only for this genre
+     */
     public void getTopStations(final ITopStationReceiver listener, String genre) {
 
         VolleyClient.getInstance(mContext).getTopStations(
@@ -48,7 +55,53 @@ public class RadioDataManager {
         );
     }
 
+    /**
+     * get single PLS file for single station
+     * @param listener
+     * @param stationID
+     */
+    public void getStationPLS(final IStationPLSReceiver listener, int stationID) {
+        VolleyClient.getInstance(mContext).checkoutPLS(
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String responseString) {
+                        listener.onStationPLSReceived(parsePLSFiles(responseString));
+                    }
 
+                },
+                null, stationID
+        );
+    }
+
+
+    /**
+     * parse Station PLS file
+     * @param response
+     * @return
+     */
+    private String parsePLSFiles(String response){
+        String[] responseArray = response.split("\n");
+        for (String kvPair : responseArray) {
+            if (!kvPair.contains("=")) {
+                continue;
+            }
+            String[] kv = kvPair.split("=");
+            String key = kv[0];
+            String value = kv[1];
+            if (key.equals("File1")) {
+                streamingURL = value;
+                break;
+            }
+        }
+        return streamingURL;
+    }
+
+
+    /**
+     * parse top stations response,
+     * @param responseString
+     * @return
+     */
     private List<Station> parseTopStations(String responseString) {
         List<Station> parsedData = new ArrayList<>();
 

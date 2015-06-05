@@ -7,5 +7,5 @@ public class Constants {
 
     public static final String TOP_STATIONS_URL = "http://www.shoutcast.com/Home/Top";
     public static final String GET_RANDOM_STATION = "http://www.shoutcast.com/Home/GetRandomStation";
-
+    public static final String STATION_BASE_URL = "http://yp.shoutcast.com/sbin/tunein-station.pls?id=";
 }
