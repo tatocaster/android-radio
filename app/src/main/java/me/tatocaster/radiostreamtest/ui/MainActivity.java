@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,8 +15,12 @@ import android.widget.Button;
 import com.android.volley.Response;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import me.tatocaster.radiostreamtest.R;
+import me.tatocaster.radiostreamtest.adapter.StationAdapter;
+import me.tatocaster.radiostreamtest.model.Station;
 import me.tatocaster.radiostreamtest.network.VolleyClient;
 
 
@@ -24,6 +30,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     String streamingURL = "";
     Button pauseBtn, resumeBtn;
     MediaPlayer mediaPlayer;
+    private RecyclerView mRecyclerView;
+    List<Station> stationList = new ArrayList<>();
+    StationAdapter stationAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +44,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         resumeBtn = (Button) findViewById(R.id.resume_btn);
         resumeBtn.setOnClickListener(this);
 
-        String url = "http://yp.shoutcast.com/sbin/tunein-station.pls?id=139479";
+        String url = "http://yp.shoutcast.com/sbin/tunein-station.pls?id=168811";
 
         VolleyClient.getInstance(this).checkoutPLS(new Response.Listener<String>() {
             @Override
@@ -55,7 +64,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                 }
                 Log.d(TAG, streamingURL);
-                if(streamingURL.equals("")){
+                if (streamingURL.equals("")) {
                     pauseBtn.setVisibility(View.INVISIBLE);
                     resumeBtn.setVisibility(View.INVISIBLE);
                     return;
@@ -72,6 +81,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }, null, url);
 
+        // recycle view init
+        mRecyclerView = (RecyclerView) findViewById(R.id.stationList);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        for(int i = 0; i < 500; i++){
+            Station station = new Station();
+            station.setBytrate(i);
+            station.setStationName("test" + i);
+            stationList.add(station);
+        }
+
+        // setting adapter for recycle view
+        stationAdapter = new StationAdapter(this, stationList);
+        mRecyclerView.setAdapter(stationAdapter);
+        stationAdapter.notifyDataSetChanged();
     }
 
 
