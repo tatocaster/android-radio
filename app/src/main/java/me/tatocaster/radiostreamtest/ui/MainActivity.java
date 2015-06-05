@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.tatocaster.radiostreamtest.interfaces.ITopStationReceiver;
 import me.tatocaster.radiostreamtest.R;
 import me.tatocaster.radiostreamtest.RadioDataManager;
 import me.tatocaster.radiostreamtest.adapter.StationAdapter;
@@ -87,12 +88,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         RadioDataManager radioDM = new RadioDataManager(this);
-        stationList = radioDM.getTopStations("");
+        // no genre, just top stations
+        radioDM.getTopStations(new ITopStationReceiver() {
+            @Override
+            public void onTopStationsReceived(List<Station> stations) {
+                // setting adapter for recycle view
+                stationAdapter = new StationAdapter(MainActivity.this, stations);
+                mRecyclerView.setAdapter(stationAdapter);
+                stationAdapter.notifyDataSetChanged();
+            }
+        }, "");
 
-        // setting adapter for recycle view
-        stationAdapter = new StationAdapter(this, stationList);
-        mRecyclerView.setAdapter(stationAdapter);
-        stationAdapter.notifyDataSetChanged();
     }
 
 

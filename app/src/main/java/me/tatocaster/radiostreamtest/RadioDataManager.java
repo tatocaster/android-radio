@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.tatocaster.radiostreamtest.interfaces.ITopStationReceiver;
 import me.tatocaster.radiostreamtest.model.Station;
 import me.tatocaster.radiostreamtest.network.VolleyClient;
 
@@ -28,28 +29,15 @@ public class RadioDataManager {
     }
 
 
-    public List<Station> getTopStations(String genre) {
+    public void getTopStations(final ITopStationReceiver listener, String genre) {
 
         VolleyClient.getInstance(mContext).getTopStations(
 
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String responseString) {
-                        try {
-                            JSONArray responseJsonArray = new JSONArray(responseString);
-                            for (int i = 0; i < responseJsonArray.length(); i++) {
-                                JSONObject stationsJsonObj = (JSONObject) responseJsonArray.get(i);
-                                // creating java object for all json object and set fields
-                                Station station = new Station();
-                                station.setStationId(Integer.valueOf(stationsJsonObj.getString("ID")));
-                                station.setBitrate(Integer.valueOf(stationsJsonObj.getString("Bitrate")));
-                                station.setStationName(stationsJsonObj.getString("Name"));
-                                station.setGenre(stationsJsonObj.getString("Genre"));
-                                stationsList.add(station);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        stationsList = parseTopStations(responseString);
+                        listener.onTopStationsReceived(stationsList);
                     }
                 },
                 new Response.ErrorListener() {
@@ -58,8 +46,29 @@ public class RadioDataManager {
                     }
                 }
         );
-        return stationsList;
     }
 
+
+    private List<Station> parseTopStations(String responseString) {
+        List<Station> parsedData = new ArrayList<>();
+
+        try {
+            JSONArray responseJsonArray = new JSONArray(responseString);
+            for (int i = 0; i < responseJsonArray.length(); i++) {
+                JSONObject stationsJsonObj = (JSONObject) responseJsonArray.get(i);
+                // creating java object for all json object and set fields
+                Station station = new Station();
+                station.setStationId(Integer.valueOf(stationsJsonObj.getString("ID")));
+                station.setBitrate(Integer.valueOf(stationsJsonObj.getString("Bitrate")));
+                station.setStationName(stationsJsonObj.getString("Name"));
+                station.setGenre(stationsJsonObj.getString("Genre"));
+                parsedData.add(station);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return parsedData;
+    }
 
 }
