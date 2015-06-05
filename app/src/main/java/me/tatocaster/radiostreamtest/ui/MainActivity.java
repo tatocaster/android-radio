@@ -85,7 +85,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mRecyclerView = (RecyclerView) findViewById(R.id.stationList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        for(int i = 0; i < 500; i++){
+        for (int i = 0; i < 500; i++) {
             Station station = new Station();
             station.setBytrate(i);
             station.setStationName("test" + i);

@@ -2,6 +2,7 @@ package me.tatocaster.radiostreamtest.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,7 @@ import me.tatocaster.radiostreamtest.model.Station;
 /**
  * Created by tatocaster on 6/5/2015.
  */
-public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHolder>{
+public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHolder> {
 
     List<Station> stations = new ArrayList<>();
     Context context;
@@ -28,7 +29,8 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHold
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.station_item, parent, false));
+        View view = LayoutInflater.from(context).inflate(R.layout.station_item, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -44,14 +46,20 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHold
     }
 
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
         TextView bitrate;
 
         public ViewHolder(View view) {
             super(view);
+            view.setOnClickListener(this);
             title = (TextView) view.findViewById(R.id.station_name);
             bitrate = (TextView) view.findViewById(R.id.bitrate);
+        }
+
+        @Override
+        public void onClick(View view) {
+            Log.d("RECYCLEVIEW", title.getText().toString());
         }
     }
 

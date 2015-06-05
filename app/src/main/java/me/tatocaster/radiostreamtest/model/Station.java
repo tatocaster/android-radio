@@ -9,7 +9,7 @@ public class Station {
     private String genre;
     private int bytrate;
 
-    public Station(){
+    public Station() {
 
     }
 
