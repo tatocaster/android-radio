@@ -7,7 +7,7 @@ public class Station {
     private int stationId;
     private String stationName;
     private String genre;
-    private int bytrate;
+    private int bitrate;
 
     public Station() {
 
@@ -37,11 +37,11 @@ public class Station {
         this.genre = genre;
     }
 
-    public int getBytrate() {
-        return bytrate;
+    public int getBitrate() {
+        return bitrate;
     }
 
-    public void setBytrate(int bytrate) {
-        this.bytrate = bytrate;
+    public void setBitrate(int bitrate) {
+        this.bitrate = bitrate;
     }
 }

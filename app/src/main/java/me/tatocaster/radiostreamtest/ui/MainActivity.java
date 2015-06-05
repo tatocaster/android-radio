@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.tatocaster.radiostreamtest.R;
+import me.tatocaster.radiostreamtest.RadioDataManager;
 import me.tatocaster.radiostreamtest.adapter.StationAdapter;
 import me.tatocaster.radiostreamtest.model.Station;
 import me.tatocaster.radiostreamtest.network.VolleyClient;
@@ -85,12 +86,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mRecyclerView = (RecyclerView) findViewById(R.id.stationList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        for (int i = 0; i < 500; i++) {
-            Station station = new Station();
-            station.setBytrate(i);
-            station.setStationName("test" + i);
-            stationList.add(station);
-        }
+        RadioDataManager radioDM = new RadioDataManager(this);
+        stationList = radioDM.getTopStations("");
 
         // setting adapter for recycle view
         stationAdapter = new StationAdapter(this, stationList);

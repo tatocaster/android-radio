@@ -47,9 +47,10 @@ public class VolleyClient {
         execute(stringRequest);
     }
 
-    public void getRandomStation(final Response.Listener<String> response, final Response.ErrorListener error) {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, Constants.GET_RANDOM_STATION, response, error);
-        execute(stringRequest);
+    // string request because volley cant request JsonArray with POST
+    public void getTopStations(final Response.Listener<String> response, final Response.ErrorListener error) {
+        StringRequest jsonArrayRequest = new StringRequest(Request.Method.POST, Constants.TOP_STATIONS_URL, response, error);
+        execute(jsonArrayRequest);
     }
 
 

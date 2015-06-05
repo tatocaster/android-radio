@@ -17,7 +17,7 @@ import me.tatocaster.radiostreamtest.model.Station;
 /**
  * Created by tatocaster on 6/5/2015.
  */
-public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHolder> {
+public class StationAdapter extends RecyclerView.Adapter<StationAdapter.StationsViewHolder> {
 
     List<Station> stations = new ArrayList<>();
     Context context;
@@ -28,9 +28,9 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHold
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public StationsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.station_item, parent, false);
-        return new ViewHolder(view);
+        return new StationsViewHolder(view);
     }
 
     @Override
@@ -39,18 +39,18 @@ public class StationAdapter extends RecyclerView.Adapter<StationAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(StationsViewHolder holder, int position) {
         Station station = stations.get(position);
         holder.title.setText(station.getStationName());
-        holder.bitrate.setText(String.valueOf(station.getBytrate()));
+        holder.bitrate.setText(String.valueOf(station.getBitrate()));
     }
 
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class StationsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
         TextView bitrate;
 
-        public ViewHolder(View view) {
+        public StationsViewHolder(View view) {
             super(view);
             view.setOnClickListener(this);
             title = (TextView) view.findViewById(R.id.station_name);
