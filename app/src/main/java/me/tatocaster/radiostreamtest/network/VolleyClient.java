@@ -8,6 +8,8 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import me.tatocaster.radiostreamtest.Constants;
+
 /**
  * Created by tatocaster on 2015-06-04.
  */
@@ -42,6 +44,11 @@ public class VolleyClient {
 
     public void checkoutPLS(final Response.Listener<String> response, final Response.ErrorListener error, String url) {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response, error);
+        execute(stringRequest);
+    }
+
+    public void getRandomStation(final Response.Listener<String> response, final Response.ErrorListener error) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, Constants.GET_RANDOM_STATION, response, error);
         execute(stringRequest);
     }
 

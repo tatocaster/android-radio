@@ -35,7 +35,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         resumeBtn = (Button) findViewById(R.id.resume_btn);
         resumeBtn.setOnClickListener(this);
 
-        String url = "http://yp.shoutcast.com/sbin/tunein-station.pls?id=175821";
+        String url = "http://yp.shoutcast.com/sbin/tunein-station.pls?id=139479";
 
         VolleyClient.getInstance(this).checkoutPLS(new Response.Listener<String>() {
             @Override
