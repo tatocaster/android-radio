@@ -8,6 +8,9 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import me.tatocaster.radiostreamtest.Constants;
 
 /**
@@ -53,5 +56,17 @@ public class VolleyClient {
         execute(jsonArrayRequest);
     }
 
+    // string request because volley cant request JsonArray with POST
+    public void getStationsByGenre(final Response.Listener<String> response, final Response.ErrorListener error, final String genreName) {
+        StringRequest jsonArrayRequest = new StringRequest(Request.Method.POST, Constants.BROWSE_BY_GENRE_URL, response, error) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> mParams = new HashMap<String, String>();
+                mParams.put("genrename", genreName);
+                return mParams;
+            }
+        };
+        execute(jsonArrayRequest);
+    }
 
 }

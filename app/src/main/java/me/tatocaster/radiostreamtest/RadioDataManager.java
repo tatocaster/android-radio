@@ -3,7 +3,6 @@ package me.tatocaster.radiostreamtest;
 import android.content.Context;
 
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,30 +32,38 @@ public class RadioDataManager {
     /**
      * get top stations. default is 500
      *
-     * @param listener interface
-     * @param genre    , if genre exists fetch only for this genre
+     * @param listener  interface
+     * @param genreName , if genre exists fetch only for this genre
      */
-    public void getTopStations(final ITopStationReceiver listener, String genre) {
+    public void getTopStations(final ITopStationReceiver listener, String genreName) {
 
-        VolleyClient.getInstance(mContext).getTopStations(
+        if (!genreName.equals("")) {
+            VolleyClient.getInstance(mContext).getStationsByGenre(
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String responseString) {
+                            stationsList = parseTopStations(responseString);
+                            listener.onTopStationsReceived(stationsList);
+                        }
+                    }, null, genreName
+            );
+        } else {
+            VolleyClient.getInstance(mContext).getTopStations(
 
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String responseString) {
-                        stationsList = parseTopStations(responseString);
-                        listener.onTopStationsReceived(stationsList);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                    }
-                }
-        );
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String responseString) {
+                            stationsList = parseTopStations(responseString);
+                            listener.onTopStationsReceived(stationsList);
+                        }
+                    }, null
+            );
+        }
     }
 
     /**
      * get single PLS file for single station
+     *
      * @param listener
      * @param stationID
      */
@@ -76,10 +83,11 @@ public class RadioDataManager {
 
     /**
      * parse Station PLS file
+     *
      * @param response
      * @return
      */
-    private String parsePLSFiles(String response){
+    private String parsePLSFiles(String response) {
         String[] responseArray = response.split("\n");
         for (String kvPair : responseArray) {
             if (!kvPair.contains("=")) {
@@ -99,6 +107,7 @@ public class RadioDataManager {
 
     /**
      * parse top stations response,
+     *
      * @param responseString
      * @return
      */

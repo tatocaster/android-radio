@@ -1,17 +1,23 @@
 package me.tatocaster.radiostreamtest.ui;
 
 import android.app.Activity;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
 import java.util.List;
 
+import me.tatocaster.radiostreamtest.Constants;
 import me.tatocaster.radiostreamtest.R;
 import me.tatocaster.radiostreamtest.RadioDataManager;
 import me.tatocaster.radiostreamtest.adapter.StationAdapter;
@@ -19,12 +25,12 @@ import me.tatocaster.radiostreamtest.interfaces.ITopStationReceiver;
 import me.tatocaster.radiostreamtest.model.Station;
 
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener, Drawer.OnDrawerItemClickListener {
 
     private static final String TAG = "MainActivity";
-    String streamingURL = "";
+    private Drawer materialDrawer;
     Button pauseBtn, resumeBtn;
-    MediaPlayer mediaPlayer;
+    RadioDataManager radioDM;
     private RecyclerView mRecyclerView;
     StationAdapter stationAdapter;
 
@@ -38,36 +44,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
         resumeBtn = (Button) findViewById(R.id.resume_btn);
         resumeBtn.setOnClickListener(this);
 
-        int url = 168811;
+        // initialize materialDrawer
+        materialDrawer = initDrawerWithListeners();
 
         // radio manager initilization
-        RadioDataManager radioDM = new RadioDataManager(this);
+        radioDM = new RadioDataManager(this);
 
         // recycle view init
         mRecyclerView = (RecyclerView) findViewById(R.id.stationList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-//        radioDM.getStationPLS(new IStationPLSReceiver() {
-//            @Override
-//            public void onStationPLSReceived(String streamURL) {
-//                streamingURL = streamURL;
-//                if (streamingURL.equals("")) {
-//                    pauseBtn.setVisibility(View.INVISIBLE);
-//                    resumeBtn.setVisibility(View.INVISIBLE);
-//                    return;
-//                }
-//                mediaPlayer = new MediaPlayer();
-//                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//                try {
-//                    mediaPlayer.setDataSource(streamingURL);
-//                    mediaPlayer.prepare(); // might take long! (for buffering, etc)
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                mediaPlayer.start();
-//            }
-//        }, url);
-
 
         // no genre, just top stations
         radioDM.getTopStations(new ITopStationReceiver() {
@@ -82,15 +67,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     }
 
+    /**
+     * initialize drawer
+     *
+     * @return Drawer result
+     */
+    private Drawer initDrawerWithListeners() {
+        final Drawer result = new DrawerBuilder()
+                .withActivity(this)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName("Alternative").withIdentifier(Constants.DRAWER_ALTERNATIVE_GENRE_ID),
+                        new PrimaryDrawerItem().withName("Jazz").withIdentifier(Constants.DRAWER_JAZZ_GENRE_ID)
+                )
+                .withOnDrawerItemClickListener(this)
+                .build();
+        return result;
+    }
+
 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.pause_btn: {
-                mediaPlayer.pause();
                 break;
             }
             case R.id.resume_btn: {
-                mediaPlayer.start();
                 break;
             }
         }
@@ -117,5 +117,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onItemClick(AdapterView<?> adapterView, View view, int i, long l, IDrawerItem iDrawerItem) {
+        switch (iDrawerItem.getIdentifier()) {
+            case Constants.DRAWER_ALTERNATIVE_GENRE_ID:
+                radioDM.getTopStations(new ITopStationReceiver() {
+                    @Override
+                    public void onTopStationsReceived(List<Station> stations) {
+                        // setting adapter for recycle view
+                        stationAdapter = new StationAdapter(MainActivity.this, stations);
+                        mRecyclerView.setAdapter(stationAdapter);
+                        stationAdapter.notifyDataSetChanged();
+                    }
+                }, "Alternative");
+                break;
+        }
+        return false;
     }
 }
