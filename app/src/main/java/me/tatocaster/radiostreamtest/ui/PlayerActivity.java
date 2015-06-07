@@ -41,7 +41,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 if (mPlayer != null) {
                     mPlayer.reset();
                 }
-                if(mPlayer.isPlaying()){
+                if (mPlayer.isPlaying()) {
                     mPlayer.stop();
                     mPlayer.release();
                 }

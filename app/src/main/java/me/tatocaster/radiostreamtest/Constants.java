@@ -14,4 +14,6 @@ public class Constants {
     public static final int DRAWER_ALTERNATIVE_GENRE_ID = 1;
     public static final int DRAWER_JAZZ_GENRE_ID = 2;
 
+    public static final int STATIONS_BY_GENRE_LIMIT = 5;
+
 }

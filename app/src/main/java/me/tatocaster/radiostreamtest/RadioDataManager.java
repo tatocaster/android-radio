@@ -42,7 +42,7 @@ public class RadioDataManager {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String responseString) {
-                            stationsList = parseTopStations(responseString);
+                            stationsList = parseTopStations(responseString, Constants.STATIONS_BY_GENRE_LIMIT);
                             listener.onTopStationsReceived(stationsList);
                         }
                     }, null, genreName
@@ -53,7 +53,7 @@ public class RadioDataManager {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String responseString) {
-                            stationsList = parseTopStations(responseString);
+                            stationsList = parseTopStations(responseString, 0);
                             listener.onTopStationsReceived(stationsList);
                         }
                     }, null
@@ -111,12 +111,12 @@ public class RadioDataManager {
      * @param responseString
      * @return
      */
-    private List<Station> parseTopStations(String responseString) {
+    private List<Station> parseTopStations(String responseString, int limit) {
         List<Station> parsedData = new ArrayList<>();
-
         try {
             JSONArray responseJsonArray = new JSONArray(responseString);
-            for (int i = 0; i < responseJsonArray.length(); i++) {
+            limit = limit != 0 ? limit : responseJsonArray.length();
+            for (int i = 0; i < limit; i++) {
                 JSONObject stationsJsonObj = (JSONObject) responseJsonArray.get(i);
                 // creating java object for all json object and set fields
                 Station station = new Station();
