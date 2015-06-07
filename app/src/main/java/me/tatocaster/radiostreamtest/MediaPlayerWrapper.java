@@ -30,12 +30,28 @@ public class MediaPlayerWrapper {
 
     }
 
-    public void release(){
+    public void release() {
         mediaPlayer.release();
     }
 
-    public void reset(){
+    public void reset() {
         mediaPlayer.reset();
+    }
+
+    public void pause() {
+        mediaPlayer.pause();
+    }
+
+    public void resume() {
+        mediaPlayer.start();
+    }
+
+    public void stop() {
+        mediaPlayer.stop();
+    }
+
+    public boolean isPlaying() {
+        return mediaPlayer.isPlaying();
     }
 
 }

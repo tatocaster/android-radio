@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -25,11 +24,10 @@ import me.tatocaster.radiostreamtest.interfaces.ITopStationReceiver;
 import me.tatocaster.radiostreamtest.model.Station;
 
 
-public class MainActivity extends Activity implements View.OnClickListener, Drawer.OnDrawerItemClickListener {
+public class MainActivity extends Activity implements Drawer.OnDrawerItemClickListener {
 
     private static final String TAG = "MainActivity";
     private Drawer materialDrawer;
-    Button pauseBtn, resumeBtn;
     RadioDataManager radioDM;
     private RecyclerView mRecyclerView;
     StationAdapter stationAdapter;
@@ -38,11 +36,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Draw
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        pauseBtn = (Button) findViewById(R.id.pause_btn);
-        pauseBtn.setOnClickListener(this);
-        resumeBtn = (Button) findViewById(R.id.resume_btn);
-        resumeBtn.setOnClickListener(this);
 
         // initialize materialDrawer
         materialDrawer = initDrawerWithListeners();
@@ -82,18 +75,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Draw
                 .withOnDrawerItemClickListener(this)
                 .build();
         return result;
-    }
-
-
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.pause_btn: {
-                break;
-            }
-            case R.id.resume_btn: {
-                break;
-            }
-        }
     }
 
 
