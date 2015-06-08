@@ -38,14 +38,9 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         rDM.getStationPLS(new IStationPLSReceiver() {
             @Override
             public void onStationPLSReceived(String streamURL) {
-                if (mPlayer != null) {
-                    mPlayer.reset();
-                }
-                if (mPlayer.isPlaying()) {
-                    mPlayer.stop();
-                    mPlayer.release();
-                }
                 mPlayer.playStream(streamURL);
+                resumeBtn.setClickable(true);
+                pauseBtn.setClickable(true);
             }
         }, stationID);
     }

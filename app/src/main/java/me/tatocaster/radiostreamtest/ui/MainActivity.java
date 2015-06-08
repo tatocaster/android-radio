@@ -14,6 +14,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.tatocaster.radiostreamtest.Constants;
@@ -31,6 +32,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
     RadioDataManager radioDM;
     private RecyclerView mRecyclerView;
     StationAdapter stationAdapter;
+    List<Station> stations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +49,16 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
         mRecyclerView = (RecyclerView) findViewById(R.id.stationList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        stations = new ArrayList<>();
+        stationAdapter = new StationAdapter(MainActivity.this, stations);
+        mRecyclerView.setAdapter(stationAdapter);
+
         // no genre, just top stations
         radioDM.getTopStations(new ITopStationReceiver() {
             @Override
-            public void onTopStationsReceived(List<Station> stations) {
+            public void onTopStationsReceived(List<Station> stationsResponse) {
                 // setting adapter for recycle view
-                stationAdapter = new StationAdapter(MainActivity.this, stations);
-                mRecyclerView.setAdapter(stationAdapter);
+                stations.addAll(stationsResponse);
                 stationAdapter.notifyDataSetChanged();
             }
         }, "");
@@ -109,7 +114,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
                     public void onTopStationsReceived(List<Station> stations) {
                         // setting adapter for recycle view
                         stationAdapter = new StationAdapter(MainActivity.this, stations);
-                        mRecyclerView.setAdapter(stationAdapter);
+                        mRecyclerView.swapAdapter(stationAdapter, true);
                         stationAdapter.notifyDataSetChanged();
                     }
                 }, "Alternative");

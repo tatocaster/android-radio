@@ -8,6 +8,8 @@ public class Station {
     private String stationName;
     private String genre;
     private int bitrate;
+    private String nowPlaying;
+
 
     public Station() {
 
@@ -43,5 +45,13 @@ public class Station {
 
     public void setBitrate(int bitrate) {
         this.bitrate = bitrate;
+    }
+
+    public void setNowPlaying(String nowPlaying) {
+        this.nowPlaying = nowPlaying;
+    }
+
+    public String getNowPlaying() {
+        return nowPlaying;
     }
 }

@@ -1,13 +1,14 @@
 package me.tatocaster.radiostreamtest;
 
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 
 import java.io.IOException;
 
 /**
  * Created by tatocaster on 2015-06-06.
  */
-public class MediaPlayerWrapper {
+public class  MediaPlayerWrapper {
 
     android.media.MediaPlayer mediaPlayer;
 
@@ -17,16 +18,22 @@ public class MediaPlayerWrapper {
     }
 
     public void playStream(String streamURL) {
-        mediaPlayer.stop();
-        mediaPlayer.reset();
+        if (isPlaying()) {
+            stop();
+            reset();
+        }
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
             mediaPlayer.setDataSource(streamURL);
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                }
+            });
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mediaPlayer.start();
 
     }
 
