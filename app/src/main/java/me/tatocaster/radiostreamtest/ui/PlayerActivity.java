@@ -2,12 +2,14 @@ package me.tatocaster.radiostreamtest.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import me.tatocaster.radiostreamtest.MediaPlayerWrapper;
 import me.tatocaster.radiostreamtest.R;
 import me.tatocaster.radiostreamtest.RadioDataManager;
+import me.tatocaster.radiostreamtest.interfaces.ICurrentTrackReceiver;
 import me.tatocaster.radiostreamtest.interfaces.IStationPLSReceiver;
 
 /**
@@ -41,6 +43,12 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 mPlayer.playStream(streamURL);
                 resumeBtn.setClickable(true);
                 pauseBtn.setClickable(true);
+            }
+        }, stationID);
+        rDM.getCurrentTrack(new ICurrentTrackReceiver() {
+            @Override
+            public void onCurrentTrackReceived(String currentTrack) {
+                Log.d("RESPONSE", currentTrack);
             }
         }, stationID);
     }

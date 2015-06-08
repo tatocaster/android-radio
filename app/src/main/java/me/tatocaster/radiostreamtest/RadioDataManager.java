@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.tatocaster.radiostreamtest.interfaces.ICurrentTrackReceiver;
 import me.tatocaster.radiostreamtest.interfaces.IStationPLSReceiver;
 import me.tatocaster.radiostreamtest.interfaces.ITopStationReceiver;
 import me.tatocaster.radiostreamtest.model.Station;
@@ -82,6 +83,45 @@ public class RadioDataManager {
 
 
     /**
+     * get current track
+     *
+     * @param listener
+     * @param stationID
+     */
+    public void getCurrentTrack(final ICurrentTrackReceiver listener, int stationID) {
+        VolleyClient.getInstance(mContext).getCurrentTrack(
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String responseString) {
+                        listener.onCurrentTrackReceived(currentTrack(responseString));
+                    }
+
+                },
+                null, stationID
+        );
+    }
+
+
+    /**
+     * @param response
+     * @return
+     */
+    public String currentTrack(String response) {
+        String currentTrack = "";
+
+        try {
+            JSONObject responseJSONObject = new JSONObject(response);
+            JSONObject stationObj = responseJSONObject.getJSONObject("Station");
+            currentTrack = stationObj.getString("CurrentTrack");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return currentTrack;
+    }
+
+
+    /**
      * parse Station PLS file
      *
      * @param response
@@ -124,6 +164,7 @@ public class RadioDataManager {
                 station.setBitrate(Integer.valueOf(stationsJsonObj.getString("Bitrate")));
                 station.setStationName(stationsJsonObj.getString("Name"));
                 station.setGenre(stationsJsonObj.getString("Genre"));
+                station.setNowPlaying(stationsJsonObj.getString("CurrentTrack"));
                 parsedData.add(station);
             }
         } catch (JSONException e) {
