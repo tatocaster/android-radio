@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import me.tatocaster.radiostreamtest.MediaPlayerWrapper;
 import me.tatocaster.radiostreamtest.R;
@@ -48,7 +49,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         rDM.getCurrentTrack(new ICurrentTrackReceiver() {
             @Override
             public void onCurrentTrackReceived(String currentTrack) {
-                Log.d("RESPONSE", currentTrack);
+                Toast.makeText(PlayerActivity.this, currentTrack, Toast.LENGTH_SHORT).show();
             }
         }, stationID);
     }

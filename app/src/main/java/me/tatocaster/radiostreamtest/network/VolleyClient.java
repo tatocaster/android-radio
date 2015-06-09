@@ -72,7 +72,7 @@ public class VolleyClient {
 
     // string request because volley cant request JsonArray with POST
     public void getCurrentTrack(final Response.Listener<String> response, final Response.ErrorListener error, final int stationID) {
-        StringRequest jsonArrayRequest = new StringRequest(Request.Method.POST, Constants.GET_CURRENT_TRACK, response, error){
+        StringRequest jsonObjRequest = new StringRequest(Request.Method.POST, Constants.GET_CURRENT_TRACK, response, error){
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> mParams = new HashMap<String, String>();
@@ -80,7 +80,7 @@ public class VolleyClient {
                 return mParams;
             }
         };
-        execute(jsonArrayRequest);
+        execute(jsonObjRequest);
     }
 
 }
