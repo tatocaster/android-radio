@@ -2,7 +2,7 @@ package me.tatocaster.radiostreamtest.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -21,6 +21,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     RadioDataManager rDM;
     MediaPlayerWrapper mPlayer;
     Button pauseBtn, resumeBtn;
+    Handler handler;
+    CurrentTrackUpdater autoUpdater;
+    private boolean inProgress;
+    private int stationID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +36,13 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         resumeBtn = (Button) findViewById(R.id.resume_btn);
         resumeBtn.setOnClickListener(this);
 
+        handler = new Handler();
+        autoUpdater = new CurrentTrackUpdater();
 
         rDM = new RadioDataManager(this);
         mPlayer = new MediaPlayerWrapper();
 
-        int stationID = getIntent().getIntExtra("stationID", 0);
+        stationID = getIntent().getIntExtra("stationID", 0);
 
         rDM.getStationPLS(new IStationPLSReceiver() {
             @Override
@@ -46,12 +52,47 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 pauseBtn.setClickable(true);
             }
         }, stationID);
-        rDM.getCurrentTrack(new ICurrentTrackReceiver() {
+       /* rDM.getCurrentTrack(new ICurrentTrackReceiver() {
             @Override
             public void onCurrentTrackReceived(String currentTrack) {
                 Toast.makeText(PlayerActivity.this, currentTrack, Toast.LENGTH_SHORT).show();
             }
+        }, stationID);*/
+
+        handler.post(autoUpdater);
+    }
+
+
+    /**
+     * CurrentTrackUpdater
+     */
+    private class CurrentTrackUpdater implements Runnable {
+        @Override
+        public void run() {
+            if (!inProgress) {
+                getCurrentTrack();
+            }
+            handler.postDelayed(this, 10000);
+        }
+    }
+
+
+    /**
+     * get current track from web service
+     */
+    private void getCurrentTrack() {
+        if (!mPlayer.isPlaying()) {
+            return;
+        }
+        inProgress = true;
+        rDM.getCurrentTrack(new ICurrentTrackReceiver() {
+            @Override
+            public void onCurrentTrackReceived(String currentTrack) {
+                Toast.makeText(PlayerActivity.this, currentTrack, Toast.LENGTH_SHORT).show();
+                inProgress = false;
+            }
         }, stationID);
+
     }
 
 
