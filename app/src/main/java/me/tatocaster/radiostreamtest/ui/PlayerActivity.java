@@ -12,6 +12,7 @@ import me.tatocaster.radiostreamtest.R;
 import me.tatocaster.radiostreamtest.RadioDataManager;
 import me.tatocaster.radiostreamtest.interfaces.ICurrentTrackReceiver;
 import me.tatocaster.radiostreamtest.interfaces.IStationPLSReceiver;
+import me.tatocaster.radiostreamtest.model.CurrentTrackInfo;
 
 /**
  * Created by tatocaster on 2015-06-07.
@@ -52,12 +53,6 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 pauseBtn.setClickable(true);
             }
         }, stationID);
-       /* rDM.getCurrentTrack(new ICurrentTrackReceiver() {
-            @Override
-            public void onCurrentTrackReceived(String currentTrack) {
-                Toast.makeText(PlayerActivity.this, currentTrack, Toast.LENGTH_SHORT).show();
-            }
-        }, stationID);*/
 
         handler.post(autoUpdater);
     }
@@ -76,7 +71,6 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         }
     }
 
-
     /**
      * get current track from web service
      */
@@ -85,10 +79,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             return;
         }
         inProgress = true;
-        rDM.getCurrentTrack(new ICurrentTrackReceiver() {
+        rDM.getCurrentTrackInfo(new ICurrentTrackReceiver() {
             @Override
-            public void onCurrentTrackReceived(String currentTrack) {
-                Toast.makeText(PlayerActivity.this, currentTrack, Toast.LENGTH_SHORT).show();
+            public void onCurrentTrackReceived(CurrentTrackInfo currentTrackInfo) {
+                Toast.makeText(PlayerActivity.this, currentTrackInfo.getArtistImageURL(), Toast.LENGTH_SHORT).show();
                 inProgress = false;
             }
         }, stationID);
@@ -108,6 +102,5 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-
 
 }

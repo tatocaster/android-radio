@@ -8,6 +8,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,5 +83,14 @@ public class VolleyClient {
         };
         execute(jsonObjRequest);
     }
+
+
+    // POST request, to get artwork by artist name.
+    public void artistGetImage(final Response.Listener<String> response, final Response.ErrorListener error, final String artist) {
+        String url = Constants.LASTFM_API_ROOT_URL + "?method=artist.getInfo&artist=" + URLEncoder.encode(artist) + "&api_key=" + Constants.LASTFM_API_KEY + "&format=json";
+        StringRequest request = new StringRequest(Request.Method.POST, url, response, error);
+        execute(request);
+    }
+
 
 }

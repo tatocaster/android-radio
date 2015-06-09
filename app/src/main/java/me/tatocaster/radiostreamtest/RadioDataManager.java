@@ -1,6 +1,7 @@
 package me.tatocaster.radiostreamtest;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Response;
 
@@ -11,9 +12,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.tatocaster.radiostreamtest.interfaces.IArtistInfoReceiver;
 import me.tatocaster.radiostreamtest.interfaces.ICurrentTrackReceiver;
 import me.tatocaster.radiostreamtest.interfaces.IStationPLSReceiver;
 import me.tatocaster.radiostreamtest.interfaces.ITopStationReceiver;
+import me.tatocaster.radiostreamtest.model.CurrentTrackInfo;
 import me.tatocaster.radiostreamtest.model.Station;
 import me.tatocaster.radiostreamtest.network.VolleyClient;
 
@@ -88,12 +91,24 @@ public class RadioDataManager {
      * @param listener
      * @param stationID
      */
-    public void getCurrentTrack(final ICurrentTrackReceiver listener, int stationID) {
+    public void getCurrentTrackInfo(final ICurrentTrackReceiver listener, int stationID) {
         VolleyClient.getInstance(mContext).getCurrentTrack(
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String responseString) {
-                        listener.onCurrentTrackReceived(currentTrack(responseString));
+                        final CurrentTrackInfo trackInfoObj = new CurrentTrackInfo();
+                        String currentTrack = parseCurrentTrack(responseString);
+                        if (!currentTrack.equals("")) {
+                            final String artist = getArtistFromCurrentTrack(currentTrack);
+                            artistGetImage(new IArtistInfoReceiver() {
+                                @Override
+                                public void onArtistInfoReceived(String imageURL) {
+                                    trackInfoObj.setArtistImageURL(imageURL);
+                                    trackInfoObj.setArtistName(artist);
+                                    listener.onCurrentTrackReceived(trackInfoObj);
+                                }
+                            }, artist);
+                        }
                     }
 
                 },
@@ -103,10 +118,59 @@ public class RadioDataManager {
 
 
     /**
+     * @param artist
+     * @return
+     */
+    private void artistGetImage(final IArtistInfoReceiver listener, String artist) {
+        VolleyClient.getInstance(mContext).artistGetImage(
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String responseString) {
+                        listener.onArtistInfoReceived(parseImageURL(responseString));
+                    }
+                },
+                null, artist
+        );
+    }
+
+
+    /**
      * @param response
      * @return
      */
-    public String currentTrack(String response) {
+    private String parseImageURL(String response) {
+        String imageURL = "";
+
+        try {
+            JSONObject responseJSONObject = new JSONObject(response);
+            JSONObject artistObj = responseJSONObject.getJSONObject("artist");
+            JSONArray imagesArr = artistObj.getJSONArray("image");
+            for (int i = 0; i < imagesArr.length(); i++) {
+                JSONObject imageObj = imagesArr.getJSONObject(i);
+                if (imageObj.getString("size").equals("extralarge")) {
+                    imageURL = imageObj.getString("#text");
+                    Log.d("RESPONSE",imageURL);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return imageURL;
+    }
+
+    private String getArtistFromCurrentTrack(String currentTrack) {
+        if (currentTrack.isEmpty()) {
+            return "";
+        }
+        String[] parts = currentTrack.split("-");
+        return parts[0];
+    }
+
+    /**
+     * @param response
+     * @return
+     */
+    private String parseCurrentTrack(String response) {
         String currentTrack = "";
 
         try {
