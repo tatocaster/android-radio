@@ -24,6 +24,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'me.neavo:volley:2014.12.09'
     compile 'com.android.support:recyclerview-v7:+'
+    compile 'com.github.bumptech.glide:glide:3.6.0'
     compile('com.mikepenz:materialdrawer:3.0.6@aar') {
         transitive = true
     }

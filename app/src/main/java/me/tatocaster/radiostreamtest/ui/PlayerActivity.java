@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import me.tatocaster.radiostreamtest.MediaPlayerWrapper;
 import me.tatocaster.radiostreamtest.R;
@@ -26,6 +29,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     CurrentTrackUpdater autoUpdater;
     private boolean inProgress;
     private int stationID;
+    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,9 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         pauseBtn.setOnClickListener(this);
         resumeBtn = (Button) findViewById(R.id.resume_btn);
         resumeBtn.setOnClickListener(this);
+
+
+        imageView = (ImageView) findViewById(R.id.artist_image);
 
         handler = new Handler();
         autoUpdater = new CurrentTrackUpdater();
@@ -53,7 +60,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 pauseBtn.setClickable(true);
             }
         }, stationID);
-
+        getCurrentTrack();
         handler.post(autoUpdater);
     }
 
@@ -82,6 +89,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         rDM.getCurrentTrackInfo(new ICurrentTrackReceiver() {
             @Override
             public void onCurrentTrackReceived(CurrentTrackInfo currentTrackInfo) {
+                Glide.clear(imageView);
+                Glide.with(PlayerActivity.this).load(currentTrackInfo.getArtistImageURL()).into(imageView);
                 Toast.makeText(PlayerActivity.this, currentTrackInfo.getArtistImageURL(), Toast.LENGTH_SHORT).show();
                 inProgress = false;
             }

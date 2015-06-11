@@ -1,7 +1,6 @@
 package me.tatocaster.radiostreamtest;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.Response;
 
@@ -126,6 +125,7 @@ public class RadioDataManager {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String responseString) {
+
                         listener.onArtistInfoReceived(parseImageURL(responseString));
                     }
                 },
@@ -149,7 +149,6 @@ public class RadioDataManager {
                 JSONObject imageObj = imagesArr.getJSONObject(i);
                 if (imageObj.getString("size").equals("extralarge")) {
                     imageURL = imageObj.getString("#text");
-                    Log.d("RESPONSE",imageURL);
                 }
             }
         } catch (JSONException e) {
@@ -163,6 +162,9 @@ public class RadioDataManager {
             return "";
         }
         String[] parts = currentTrack.split("-");
+        if (parts[0] == null) {
+            return parts[0];
+        }
         return parts[0];
     }
 

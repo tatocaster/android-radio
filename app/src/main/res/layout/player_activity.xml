@@ -21,4 +21,10 @@
         android:layout_toRightOf="@+id/pause_btn"
         android:layout_toEndOf="@+id/pause_btn" />
 
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:contentDescription="Image"
+        android:id="@+id/artist_image"/>
+
 </LinearLayout>
