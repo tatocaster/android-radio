@@ -60,7 +60,6 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
                 pauseBtn.setClickable(true);
             }
         }, stationID);
-        getCurrentTrack();
         handler.post(autoUpdater);
     }
 
@@ -89,8 +88,12 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         rDM.getCurrentTrackInfo(new ICurrentTrackReceiver() {
             @Override
             public void onCurrentTrackReceived(CurrentTrackInfo currentTrackInfo) {
-                Glide.clear(imageView);
-                Glide.with(PlayerActivity.this).load(currentTrackInfo.getArtistImageURL()).into(imageView);
+                if(currentTrackInfo.getArtistImageURL() == ""){
+                    Glide.with(PlayerActivity.this).load(R.mipmap.ic_launcher).into(imageView);
+                }
+                else{
+                    Glide.with(PlayerActivity.this).load(currentTrackInfo.getArtistImageURL()).into(imageView);
+                }
                 Toast.makeText(PlayerActivity.this, currentTrackInfo.getArtistImageURL(), Toast.LENGTH_SHORT).show();
                 inProgress = false;
             }
