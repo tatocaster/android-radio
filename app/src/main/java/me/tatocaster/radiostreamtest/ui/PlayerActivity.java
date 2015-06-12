@@ -55,6 +55,9 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         rDM.getStationPLS(new IStationPLSReceiver() {
             @Override
             public void onStationPLSReceived(String streamURL) {
+//                Intent playerService = new Intent(PlayerActivity.this, PlayerService.class);
+//                playerService.putExtra("streamURL", streamURL);
+//                startService(playerService);
                 mPlayer.playStream(streamURL);
                 resumeBtn.setClickable(true);
                 pauseBtn.setClickable(true);

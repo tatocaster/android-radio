@@ -1,6 +1,7 @@
 package me.tatocaster.radiostreamtest.ui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +34,7 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
     private RecyclerView mRecyclerView;
     StationAdapter stationAdapter;
     List<Station> stations;
+    ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +56,14 @@ public class MainActivity extends Activity implements Drawer.OnDrawerItemClickLi
         mRecyclerView.setAdapter(stationAdapter);
 
         // no genre, just top stations
+        progress = ProgressDialog.show(this, "Loading", "Please Wait.", true);
         radioDM.getTopStations(new ITopStationReceiver() {
             @Override
             public void onTopStationsReceived(List<Station> stationsResponse) {
                 // setting adapter for recycle view
                 stations.addAll(stationsResponse);
                 stationAdapter.notifyDataSetChanged();
+                progress.dismiss();
             }
         }, "");
 
