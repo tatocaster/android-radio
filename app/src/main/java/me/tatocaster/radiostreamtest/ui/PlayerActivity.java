@@ -73,7 +73,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             if (!inProgress) {
                 getCurrentTrack();
             }
-            handler.postDelayed(this, 10000);
+            handler.postDelayed(this, 5000);
         }
     }
 
@@ -88,13 +88,12 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         rDM.getCurrentTrackInfo(new ICurrentTrackReceiver() {
             @Override
             public void onCurrentTrackReceived(CurrentTrackInfo currentTrackInfo) {
-                if(currentTrackInfo.getArtistImageURL() == ""){
+                if (currentTrackInfo.getArtistImageURL().equals("") || currentTrackInfo.getArtistImageURL() == null) {
                     Glide.with(PlayerActivity.this).load(R.mipmap.ic_launcher).into(imageView);
-                }
-                else{
+                } else {
                     Glide.with(PlayerActivity.this).load(currentTrackInfo.getArtistImageURL()).into(imageView);
                 }
-                Toast.makeText(PlayerActivity.this, currentTrackInfo.getArtistImageURL(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(PlayerActivity.this, currentTrackInfo.getArtistName(), Toast.LENGTH_SHORT).show();
                 inProgress = false;
             }
         }, stationID);

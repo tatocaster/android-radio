@@ -1,6 +1,7 @@
 package me.tatocaster.radiostreamtest;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Response;
 
@@ -8,6 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +78,8 @@ public class RadioDataManager {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String responseString) {
-                        listener.onStationPLSReceived(parsePLSFiles(responseString));
+                        Log.d("RESPONSE", responseString);
+                        listener.onStationPLSReceived(parseM3UFiles(responseString));
                     }
 
                 },
@@ -99,18 +103,26 @@ public class RadioDataManager {
                         String currentTrack = parseCurrentTrack(responseString);
                         if (!currentTrack.equals("")) {
                             final String artist = getArtistFromCurrentTrack(currentTrack);
-                            artistGetImage(new IArtistInfoReceiver() {
-                                @Override
-                                public void onArtistInfoReceived(String imageURL) {
-                                    trackInfoObj.setArtistImageURL(imageURL);
-                                    trackInfoObj.setArtistName(artist);
-                                    listener.onCurrentTrackReceived(trackInfoObj);
-                                }
-                            }, artist);
+                            if (artist.equals("")) {
+                                trackInfoObj.setArtistName(artist);
+                                trackInfoObj.setArtistImageURL("");
+                                listener.onCurrentTrackReceived(trackInfoObj);
+                            } else {
+                                artistGetImage(new IArtistInfoReceiver() {
+                                    @Override
+                                    public void onArtistInfoReceived(String imageURL) {
+                                        trackInfoObj.setArtistImageURL(imageURL);
+                                        trackInfoObj.setArtistName(artist);
+                                        listener.onCurrentTrackReceived(trackInfoObj);
+                                    }
+                                }, artist);
+                            }
                         }
                     }
 
-                },
+                }
+
+                ,
                 null, stationID
         );
     }
@@ -188,28 +200,24 @@ public class RadioDataManager {
 
 
     /**
-     * parse Station PLS file
+     * parse Station M3U file
      *
      * @param response
      * @return
      */
-    private String parsePLSFiles(String response) {
-        String[] responseArray = response.split("\n");
-        for (String kvPair : responseArray) {
-            if (!kvPair.contains("=")) {
-                continue;
+    private String parseM3UFiles(String response) {
+        String[] responseArray = response.split("\\n");
+        String line3 = responseArray[2];
+        if (!line3.equals("")) {
+            try {
+                URL url = new URL(line3);
+            } catch (MalformedURLException e) {
+                return streamingURL;
             }
-            String[] kv = kvPair.split("=");
-            String key = kv[0];
-            String value = kv[1];
-            if (key.equals("File1")) {
-                streamingURL = value;
-                break;
-            }
+            streamingURL = line3;
         }
         return streamingURL;
     }
-
 
     /**
      * parse top stations response,
@@ -238,6 +246,30 @@ public class RadioDataManager {
         }
 
         return parsedData;
+    }
+
+
+    /**
+     * parse Station PLS file
+     *
+     * @param response
+     * @return
+     */
+    private String parsePLSFiles(String response) {
+        String[] responseArray = response.split("\n");
+        for (String kvPair : responseArray) {
+            if (!kvPair.contains("=")) {
+                continue;
+            }
+            String[] kv = kvPair.split("=");
+            String key = kv[0];
+            String value = kv[1];
+            if (key.equals("File1")) {
+                streamingURL = value;
+                break;
+            }
+        }
+        return streamingURL;
     }
 
 }
