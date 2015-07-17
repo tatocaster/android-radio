@@ -124,7 +124,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         @Override
         public void run() {
             if (!inProgress) {
-//                getCurrentTrack();
+                getCurrentTrack();
             }
             handler.postDelayed(this, 5000);
         }
