@@ -1,6 +1,9 @@
 package me.tatocaster.radiostreamtest.ui;
 
 import android.app.Activity;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -10,7 +13,11 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
-import me.tatocaster.radiostreamtest.MediaPlayerWrapper;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import me.tatocaster.radiostreamtest.R;
 import me.tatocaster.radiostreamtest.RadioDataManager;
 import me.tatocaster.radiostreamtest.interfaces.ICurrentTrackReceiver;
@@ -23,13 +30,15 @@ import me.tatocaster.radiostreamtest.model.CurrentTrackInfo;
 public class PlayerActivity extends Activity implements View.OnClickListener {
 
     RadioDataManager rDM;
-    MediaPlayerWrapper mPlayer;
+    MediaPlayer mediaPlayer = null;
     Button pauseBtn, resumeBtn;
     Handler handler;
     CurrentTrackUpdater autoUpdater;
     private boolean inProgress;
     private int stationID;
     ImageView imageView;
+    boolean isPlaying = false;
+    int streamIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,26 +53,67 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
         imageView = (ImageView) findViewById(R.id.artist_image);
 
+
+        // es ckde block ar unda iyos aq UI ichedeba da imitom
         handler = new Handler();
         autoUpdater = new CurrentTrackUpdater();
 
         rDM = new RadioDataManager(this);
-        mPlayer = new MediaPlayerWrapper();
 
         stationID = getIntent().getIntExtra("stationID", 0);
 
         rDM.getStationPLS(new IStationPLSReceiver() {
             @Override
-            public void onStationPLSReceived(String streamURL) {
-//                Intent playerService = new Intent(PlayerActivity.this, PlayerService.class);
-//                playerService.putExtra("streamURL", streamURL);
-//                startService(playerService);
-                mPlayer.playStream(streamURL);
+            public void onStationPLSReceived(List<String> streamURLList) {
+                playRadio(streamURLList);
                 resumeBtn.setClickable(true);
                 pauseBtn.setClickable(true);
             }
-        }, stationID);
+        }, stationID, false);
         handler.post(autoUpdater);
+    }
+
+
+    public void playRadio(final List<String> streamURLList) {
+        if (isPlaying) {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+        }
+        mediaPlayer = new MediaPlayer();
+        if (streamURLList.isEmpty()) {
+            return;
+        }
+        try {
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            Map<String, String> headerMap = new HashMap<String, String>();
+            headerMap.put("User-Agent", "vlc/1.1.4 LibVLC/1.1.4");
+            Uri uri = Uri.parse(streamURLList.get(streamIndex));
+            mediaPlayer.setDataSource(this, uri, headerMap);
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                    isPlaying = true;
+                }
+            });
+            mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                    if (streamIndex == streamURLList.size()) {
+                        isPlaying = false;
+                        return false;
+                    } else {
+                        mediaPlayer.reset();
+                        mediaPlayer.release();
+                        streamIndex++;
+                        playRadio(streamURLList);
+                        return true;
+                    }
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -84,7 +134,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
      * get current track from web service
      */
     private void getCurrentTrack() {
-        if (!mPlayer.isPlaying()) {
+        if (!isPlaying) {
             return;
         }
         inProgress = true;
@@ -107,11 +157,13 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.pause_btn: {
-                mPlayer.pause();
+                mediaPlayer.pause();
+                isPlaying = false;
                 break;
             }
             case R.id.resume_btn: {
-                mPlayer.resume();
+                mediaPlayer.start();
+                isPlaying = true;
                 break;
             }
         }

@@ -1,7 +1,6 @@
 package me.tatocaster.radiostreamtest;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.Response;
 
@@ -73,17 +72,21 @@ public class RadioDataManager {
      * @param listener
      * @param stationID
      */
-    public void getStationPLS(final IStationPLSReceiver listener, int stationID) {
+    public void getStationPLS(final IStationPLSReceiver listener, int stationID, final Boolean PLSFile) {
         VolleyClient.getInstance(mContext).checkoutPLS(
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String responseString) {
-                        Log.d("RESPONSE", responseString);
+                        if (PLSFile) {
+                            listener.onStationPLSReceived(parsePLSFiles(responseString));
+                        } else {
+                            listener.onStationPLSReceived(parseM3UFiles(responseString));
+                        }
                         listener.onStationPLSReceived(parseM3UFiles(responseString));
                     }
 
                 },
-                null, stationID
+                null, stationID, PLSFile
         );
     }
 
@@ -205,18 +208,30 @@ public class RadioDataManager {
      * @param response
      * @return
      */
-    private String parseM3UFiles(String response) {
-        String[] responseArray = response.split("\\n");
-        String line3 = responseArray[2];
-        if (!line3.equals("")) {
-            try {
-                URL url = new URL(line3);
-            } catch (MalformedURLException e) {
-                return streamingURL;
+    private static List<String> parseM3UFiles(String response) {
+
+        List<String> urlList = new ArrayList<>();
+        String[] responseArray = response.split("\\r?\\n");
+        if (responseArray.length <= 2) {
+            return urlList;
+        } else {
+            for (String currentStr : responseArray) {
+                if (!currentStr.equals("")) {
+                    try {
+                        URL url = new URL(currentStr);
+                    } catch (MalformedURLException e) {
+                        continue;
+                    }
+                    /*if(Character.isDigit(currentStr.charAt(currentStr.length()-1))){
+                        urlList.add(currentStr + "/;");
+                    }else{
+                        urlList.add(currentStr);
+                    }*/
+                    urlList.add(currentStr + "/;");
+                }
             }
-            streamingURL = line3;
+            return urlList;
         }
-        return streamingURL;
     }
 
     /**
@@ -255,21 +270,27 @@ public class RadioDataManager {
      * @param response
      * @return
      */
-    private String parsePLSFiles(String response) {
-        String[] responseArray = response.split("\n");
+    private static List<String> parsePLSFiles(String response) {
+        List<String> urlList = new ArrayList<>();
+        String[] responseArray = response.split("\\n");
         for (String kvPair : responseArray) {
             if (!kvPair.contains("=")) {
                 continue;
             }
             String[] kv = kvPair.split("=");
-            String key = kv[0];
-            String value = kv[1];
-            if (key.equals("File1")) {
-                streamingURL = value;
-                break;
+            try {
+                URL url = new URL(kv[1]);
+            } catch (MalformedURLException e) {
+                continue;
             }
+/*            if(Character.isDigit(kv[1].charAt(kv[1].length() - 1))) {
+                urlList.add(kv[1] + "/;");
+            }else{
+                urlList.add(kv[1]);
+            }*/
+            urlList.add(kv[1] + "/;");
         }
-        return streamingURL;
+        return urlList;
     }
 
 }

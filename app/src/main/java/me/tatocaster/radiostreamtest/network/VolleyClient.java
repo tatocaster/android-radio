@@ -45,8 +45,12 @@ public class VolleyClient {
     }
 
 
-    public void checkoutPLS(final Response.Listener<String> response, final Response.ErrorListener error, int stationID) {
-        final String stationURL = Constants.STATION_BASE_URL + stationID;
+    public void checkoutPLS(final Response.Listener<String> response, final Response.ErrorListener error, int stationID, final Boolean PLSFile) {
+        String fileToParse = "m3u";
+        if (PLSFile) {
+            fileToParse = "pls";
+        }
+        final String stationURL = Constants.STATION_BASE_URL + fileToParse + "?id=" + stationID;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, stationURL, response, error);
         execute(stringRequest);
     }
@@ -73,7 +77,7 @@ public class VolleyClient {
 
     // string request because volley cant request JsonArray with POST
     public void getCurrentTrack(final Response.Listener<String> response, final Response.ErrorListener error, final int stationID) {
-        StringRequest jsonObjRequest = new StringRequest(Request.Method.POST, Constants.GET_CURRENT_TRACK, response, error){
+        StringRequest jsonObjRequest = new StringRequest(Request.Method.POST, Constants.GET_CURRENT_TRACK, response, error) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> mParams = new HashMap<String, String>();
