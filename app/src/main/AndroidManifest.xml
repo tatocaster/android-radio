@@ -23,10 +23,6 @@
             android:name=".ui.PlayerActivity">
         </activity>
 
-        <service
-            android:name=".service.PlayerService"
-            android:exported="false" />
-
     </application>
 
 

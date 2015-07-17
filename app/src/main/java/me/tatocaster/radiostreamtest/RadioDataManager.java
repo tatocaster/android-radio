@@ -222,11 +222,6 @@ public class RadioDataManager {
                     } catch (MalformedURLException e) {
                         continue;
                     }
-                    /*if(Character.isDigit(currentStr.charAt(currentStr.length()-1))){
-                        urlList.add(currentStr + "/;");
-                    }else{
-                        urlList.add(currentStr);
-                    }*/
                     urlList.add(currentStr + "/;");
                 }
             }
@@ -283,11 +278,6 @@ public class RadioDataManager {
             } catch (MalformedURLException e) {
                 continue;
             }
-/*            if(Character.isDigit(kv[1].charAt(kv[1].length() - 1))) {
-                urlList.add(kv[1] + "/;");
-            }else{
-                urlList.add(kv[1]);
-            }*/
             urlList.add(kv[1] + "/;");
         }
         return urlList;

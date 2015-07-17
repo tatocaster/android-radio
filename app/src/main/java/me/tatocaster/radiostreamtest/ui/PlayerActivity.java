@@ -65,6 +65,10 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         rDM.getStationPLS(new IStationPLSReceiver() {
             @Override
             public void onStationPLSReceived(List<String> streamURLList) {
+                if (isPlaying) {
+                    mediaPlayer.stop();
+                    mediaPlayer.reset();
+                }
                 playRadio(streamURLList);
                 resumeBtn.setClickable(true);
                 pauseBtn.setClickable(true);
@@ -75,10 +79,6 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
 
 
     public void playRadio(final List<String> streamURLList) {
-        if (isPlaying) {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-        }
         mediaPlayer = new MediaPlayer();
         if (streamURLList.isEmpty()) {
             return;
@@ -99,8 +99,8 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
             mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                    isPlaying = false;
                     if (streamIndex == streamURLList.size()) {
-                        isPlaying = false;
                         return false;
                     } else {
                         mediaPlayer.reset();
@@ -124,7 +124,7 @@ public class PlayerActivity extends Activity implements View.OnClickListener {
         @Override
         public void run() {
             if (!inProgress) {
-                getCurrentTrack();
+//                getCurrentTrack();
             }
             handler.postDelayed(this, 5000);
         }
